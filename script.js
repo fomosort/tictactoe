@@ -1,6 +1,6 @@
 //Gameboard module
 const gameBoard = (() => {
-  const board = [
+  let board = [
     [" ", " ", " "],
     [" ", " ", " "],
     [" ", " ", " "],
@@ -10,20 +10,36 @@ const gameBoard = (() => {
     board[row][column] = pieceXO;
   };
 
+  const resetBoard = () => {
+    board = [
+      [" ", " ", " "],
+      [" ", " ", " "],
+      [" ", " ", " "],
+    ];
+  };
+
   //TODO:use an alternative logic to check if empty
-  const checkOccupied = (row, column) => {
-    const isOkayToMove = board[row][column] === " ";
+  const checkOccupied = (row, column, piece1, piece2) => {
+    console.log(board[row][column]);
+    const isOkayToMove =
+      board[row][column] !== piece1 && board[row][column] !== piece2;
+    console.log(isOkayToMove);
     return isOkayToMove;
   };
 
-  return { board, updateBoard, checkOccupied };
+  return { board, updateBoard, checkOccupied, resetBoard };
 })();
 
-const displayController = ((board) => {
+const displayController = (() => {
   const boardElem = document.getElementById("board");
   const allSquares = document.querySelectorAll(".square");
   const messageElem = document.getElementById("message");
   const turnDisplayElem = document.getElementById("player-turn");
+  const buttonReset = document.querySelector("button#reset");
+  const buttonStart = document.querySelector("button#start");
+  const playerName = document.querySelector("input#player-name");
+  const cpuName = document.querySelector("input#cpu-name");
+
   const initBoardHTML = (board) => {
     for (i = 0; i < allSquares.length; i++) {
       allSquares[i].textContent = board.flat()[i];
@@ -51,12 +67,30 @@ const displayController = ((board) => {
     const positionToMove = [this.getAttribute("row"), this.getAttribute("col")];
     gameController.makePlayerPlayPiece(positionToMove);
   };
+
+  const resetGame = () => {
+    playerName.value = "player";
+    cpuName.value = "cpu";
+    messageElem.textContent = "";
+    turnDisplayElem.textContent = "";
+    gameController.resetGame();
+  };
+  const startGame = () => {
+    gameController.initGame(playerName.value, cpuName.value);
+  };
+
   // #endregion
 
   // #region Event Listeners
-  allSquares.forEach((square) =>
-    square.addEventListener("click", clickHandlerAddPiece)
-  );
+  const initEventListeners = () => {
+    allSquares.forEach((square) =>
+      square.addEventListener("click", clickHandlerAddPiece)
+    );
+
+    buttonReset.addEventListener("click", resetGame);
+    buttonStart.addEventListener("click", startGame);
+  };
+
   // #endregion
 
   return {
@@ -67,18 +101,34 @@ const displayController = ((board) => {
     allSquares,
     messageElem,
     turnDisplayElem,
+    initEventListeners,
   };
-})(board);
+})();
 
 const gameController = (() => {
-  
-    let maxTurns
-    let currentTurn
-    let humanPlayer
-    let cpuPlayer
-    let currentPlayer
+  let maxTurns;
+  let currentTurn;
+  let humanPlayer;
+  let cpuPlayer;
+  let currentPlayer;
 
-    const Player = (piece, playerName) => {
+  const initGame = (playerName = "player", cpuName = "cpu") => {
+    gameBoard.board = [
+      [" ", " ", " "],
+      [" ", " ", " "],
+      [" ", " ", " "],
+    ];
+    displayController.initBoardHTML(gameBoard.board);
+    maxTurns = gameBoard.board.flat().length;
+    currentTurn = 1;
+    humanPlayer = Player("X", playerName);
+    cpuPlayer = Player("O", cpuName);
+    console.log(humanPlayer);
+    currentPlayer = humanPlayer;
+  };
+  //   initGame();
+
+  const Player = (piece, playerName) => {
     const info = {
       playerName,
       score: 0,
@@ -87,7 +137,13 @@ const gameController = (() => {
 
     //Returns true if piece is played, false if not played
     const playPiece = (playPosition) => {
-      if (gameBoard.checkOccupied(...playPosition)) {
+      if (
+        gameBoard.checkOccupied(
+          ...playPosition,
+          humanPlayer.info.pieceType,
+          cpuPlayer.info.pieceType
+        )
+      ) {
         gameBoard.updateBoard(...playPosition, info.pieceType);
         displayController.updateBoardHTML(...playPosition, info.pieceType);
 
@@ -104,22 +160,7 @@ const gameController = (() => {
     };
     return { info, playPiece };
   };
-
-  const initGame = () => {
-    gameBoard.board = [
-      [" ", " ", " "],
-      [" ", " ", " "],
-      [" ", " ", " "],
-    ];
-    displayController.initBoardHTML(gameBoard.board);
-     maxTurns = gameBoard.board.flat().length;
-     currentTurn = 1;
-
-     humanPlayer = Player("X", "human");
-     cpuPlayer = Player("O", "computer");
-     currentPlayer = humanPlayer;
-  };
-  initGame();
+  displayController.initEventListeners();
 
   const changeCurrentPlayer = () => {
     currentPlayer = currentPlayer === humanPlayer ? cpuPlayer : humanPlayer;
@@ -156,13 +197,20 @@ const gameController = (() => {
       );
 
     //TODO: freeze all game functions
-    //TODO: ask if should reset game
   };
   const resetGame = () => {
+    gameBoard.board = [
+        [" ", " ", " "],
+        [" ", " ", " "], mo
+        [" ", " ", " "],
+      ]
+    gameBoard.resetBoard();
+
+    console.log(gameBoard.board);
     initGame();
   };
 
-  return { makePlayerPlayPiece };
+  return { makePlayerPlayPiece, resetGame, initGame };
 })();
 
 const checkWinner = (board, currentPiece) => {
