@@ -18,7 +18,6 @@ const gameBoard = (() => {
     ];
   };
 
-  //TODO:use an alternative logic to check if empty
   const checkOccupied = (row, column, piece1, piece2) => {
     console.log(board[row][column]);
     const isOkayToMove =
@@ -57,7 +56,6 @@ const displayController = (() => {
 
   const updateMessage = (target, message) => {
     target.textContent = message;
-    // messageElem.textContent = message;
   };
 
   //Event Listeners
@@ -126,7 +124,6 @@ const gameController = (() => {
     console.log(humanPlayer);
     currentPlayer = humanPlayer;
   };
-  //   initGame();
 
   const Player = (piece, playerName) => {
     const info = {
@@ -135,7 +132,6 @@ const gameController = (() => {
       pieceType: piece,
     };
 
-    //Returns true if piece is played, false if not played
     const playPiece = (playPosition) => {
       if (
         gameBoard.checkOccupied(
@@ -164,7 +160,6 @@ const gameController = (() => {
 
   const changeCurrentPlayer = () => {
     currentPlayer = currentPlayer === humanPlayer ? cpuPlayer : humanPlayer;
-    // console.log(currentPlayer);
     displayController.updateMessage(
       displayController.turnDisplayElem,
       `${currentPlayer.info.playerName}'s turn : ${currentPlayer.info.pieceType}`
@@ -182,12 +177,9 @@ const gameController = (() => {
       currentTurn++;
     }
 
-    // currentPlayer.info.pieceType
-    //if checkWinner returns false, keep playing
   };
 
   const endGame = (gameResult) => {
-    // const gameResult = gameResult
     if (gameResult === "Draw") {
       displayController.updateMessage(displayController.messageElem, "Draw");
     } else
@@ -196,7 +188,6 @@ const gameController = (() => {
         `${gameResult} wins!`
       );
 
-    //TODO: freeze all game functions
   };
   const resetGame = () => {
     gameBoard.board = [
@@ -217,9 +208,7 @@ const checkWinner = (board, currentPiece) => {
   const testBoard = board;
   //Given an array, check if every item in the array is the same
   const allSquaresMatch = (arrayToCompare) => {
-    // console.log(arrayToCompare);
     const match = arrayToCompare.every((item) => item === currentPiece);
-    // const match = arrayToCompare.every((item) => item === arrayToCompare[0]);
     return match;
   };
 
@@ -231,7 +220,6 @@ const checkWinner = (board, currentPiece) => {
     for (i = 0; i < testBoard[0].length; i++) {
       const arrayToCompare = testBoard.map((row) => row[i]);
       const result = allSquaresMatch(arrayToCompare);
-      //   console.log("vertical:" + result);
 
       if (result) return result;
     }
@@ -260,37 +248,3 @@ const checkWinner = (board, currentPiece) => {
     ) && currentPiece
   );
 };
-
-//Test boards
-const testBoard1 = [
-  ["X", "O", "X"],
-  ["X", "X", "O"],
-  ["X", "O", "O"],
-];
-
-const testBoard2 = [
-  ["X", "X", "X"],
-  ["O", "X", "O"],
-  ["X", "O", "X"],
-];
-
-const testBoard3 = [
-  ["X", "O", "O"],
-  ["O", "X", "O"],
-  ["X", "O", "O"],
-];
-const testBoard4AllFail = [
-  ["X", "O", "O"],
-  ["O", "X", "X"],
-  ["X", "O", "O"],
-];
-
-// checkWinner()
-// console.log(horizontal(testBoard2));
-
-// console.log(document.querySelector(`.square[row="1"][col="1"]`));
-
-// gameBoard.updateBoard(0, 2, "O");
-// gameBoard.updateBoard(0, 1, "X");
-// displayController.updateBoardHTML(0, 2, "O");
-// displayController.updateBoardHTML(0, 1, "X");
