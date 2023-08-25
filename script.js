@@ -115,14 +115,23 @@ const gameController = (() => {
   };
 
   const makePlayerPlayPiece = (position) => {
+    const currentPiece = currentPlayer.info.pieceType;
     const wasPlaySuccessful = currentPlayer.playPiece(position);
-    wasPlaySuccessful &&
-      checkWinner(gameBoard.board, currentPlayer.info.pieceType);
-    wasPlaySuccessful && changeCurrentPlayer();
+    if (wasPlaySuccessful) {
+      checkWinner(gameBoard.board, currentPiece) === currentPiece
+        ? endGame(currentPiece)
+        : changeCurrentPlayer();
+    }
 
     // currentPlayer.info.pieceType
     //if checkWinner returns false, keep playing
   };
+  
+  const endGame = (currentPiece) =>{
+    console.log(`${currentPiece} wins!`)
+    displayController.updateMessage(displayController.messageElem, `${currentPiece} wins!`)
+  }
+
   return { makePlayerPlayPiece };
 })();
 
@@ -137,7 +146,7 @@ const checkWinner = (board, currentPiece) => {
   };
 
   const horizontal = (testBoard) => {
-    return testBoard.some(row => allSquaresMatch(row))
+    return testBoard.some((row) => allSquaresMatch(row));
   };
 
   const vertical = (testBoard) => {
@@ -159,15 +168,19 @@ const checkWinner = (board, currentPiece) => {
       allSquaresMatch(leftToRightArray) || allSquaresMatch(rightToLeftArray);
 
     if (result) return result;
-    return false
+    return false;
   };
 
   const resultHorizontal = horizontal(testBoard);
   const resultVertical = vertical(testBoard);
   const resultDiagonal = diagonal(testBoard);
-  
+
   //If any of the patterns match, return the winner's piece
- return [resultHorizontal, resultVertical,resultDiagonal].some(result => result) && currentPiece
+  return (
+    [resultHorizontal, resultVertical, resultDiagonal].some(
+      (result) => result
+    ) && currentPiece
+  );
 };
 
 //Test boards
