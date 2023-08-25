@@ -117,7 +117,6 @@ const gameController = (() => {
     currentTurn = 1;
     humanPlayer = Player("X", playerName);
     cpuPlayer = Player("O", cpuName);
-    console.log(humanPlayer);
     currentPlayer = humanPlayer;
   };
 
@@ -195,8 +194,6 @@ const gameController = (() => {
 })();
 
 const checkWinner = (board, currentPiece) => {
-  console.log("checkWinner started");
-  console.log(gameBoard.board);
   const testBoard = board;
   //Given an array, check if every item in the array is the same
   const allSquaresMatch = (arrayToCompare) => {
@@ -232,7 +229,6 @@ const checkWinner = (board, currentPiece) => {
   const resultHorizontal = horizontal(testBoard);
   const resultVertical = vertical(testBoard);
   const resultDiagonal = diagonal(testBoard);
-console.log(resultHorizontal,resultVertical,resultDiagonal);
   //If any of the patterns match, return the winner's piece
   return (
     [resultHorizontal, resultVertical, resultDiagonal].some(
