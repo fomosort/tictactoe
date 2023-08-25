@@ -48,7 +48,7 @@ const displayController = ((board) => {
 
   // #region Event Handler Functions
   const clickHandlerAddPiece = function () {
-    const positionToMove = [this.getAttribute("row"), this.getAttribute("col")]
+    const positionToMove = [this.getAttribute("row"), this.getAttribute("col")];
     gameController.makePlayerPlayPiece(positionToMove);
   };
   // #endregion
@@ -66,14 +66,13 @@ const displayController = ((board) => {
     updateMessage,
     allSquares,
     messageElem,
-    turnDisplayElem
+    turnDisplayElem,
   };
 })(board);
 
 const gameController = (() => {
-    displayController.initBoardHTML(gameBoard.board);
+  displayController.initBoardHTML(gameBoard.board);
   const maxTurns = gameBoard.board.flat().length;
-
 
   const Player = (piece, playerName) => {
     const info = {
@@ -86,8 +85,17 @@ const gameController = (() => {
       if (gameBoard.checkOccupied(...playPosition)) {
         gameBoard.updateBoard(...playPosition, info.pieceType);
         displayController.updateBoardHTML(...playPosition, info.pieceType);
+
+        displayController.updateMessage(
+          displayController.turnDisplayElem,
+          `${currentPlayer.info.playerName}'s turn : ${currentPlayer.info.pieceType}`
+        );
+        displayController.updateMessage(displayController.messageElem, " ");
       } else {
-        displayController.updateMessage(displayController.messageElem, "Square is occupied");
+        displayController.updateMessage(
+          displayController.messageElem,
+          "Square is occupied"
+        );
         console.log("Square is occupied");
       }
     };
@@ -106,55 +114,55 @@ const gameController = (() => {
   const makePlayerPlayPiece = (position) => {
     currentPlayer.playPiece(position);
     changeCurrentPlayer();
-    displayController.updateMessage(
-        displayController.turnDisplayElem,
-      `${currentPlayer.info.playerName}'s turn : ${currentPlayer.info.pieceType}`
-    );
-    displayController.updateMessage(displayController.messageElem, " ");
   };
-  return {makePlayerPlayPiece}
+  return { makePlayerPlayPiece };
 })();
 
-// const checkWinner = (board) => {
-const testBoard = board;
-//Given an array, check if every item in the array is the same
-const allSquaresMatch = (arrayToCompare) => {
-  const match = arrayToCompare.every((item) => item === arrayToCompare[0]);
-  return match ? arrayToCompare[0] : false;
-};
+const checkWinner = (board) => {
+  const testBoard = board;
+  //Given an array, check if every item in the array is the same
+  const allSquaresMatch = (arrayToCompare) => {
+    const match = arrayToCompare.every((item) => item === arrayToCompare[0]);
+    return match ? arrayToCompare[0] : false;
+  };
 
-const horizontal = (testBoard) => {
-  testBoard.forEach((row) => {
-    const result = allSquaresMatch(row);
-    console.log(result);
-    if (result) return result;
-  });
-  return false;
-};
+  const horizontal = (testBoard) => {
+    testBoard.forEach((row) => {
+      const result = allSquaresMatch(row);
+      console.log(result);
+      if (result) return result;
+    });
+    return false;
+  };
 
-const vertical = (testBoard) => {
-  for (i = 0; i < testBoard[0].length; i++) {
-    const arrayToCompare = testBoard.map((row) => row[i]);
-    const result = allSquaresMatch(arrayToCompare);
-    if (result) return result;
-  }
-  return false;
-};
-const diagonal = (testBoard) => {
-  const leftToRightArray = testBoard.map((row, rowIndex) => row[rowIndex]);
-  const rightToLeftArray = testBoard.map(
-    (row, rowIndex) => row[row.length - 1 - rowIndex]
-  );
+  const vertical = (testBoard) => {
+    for (i = 0; i < testBoard[0].length; i++) {
+      const arrayToCompare = testBoard.map((row) => row[i]);
+      const result = allSquaresMatch(arrayToCompare);
+      if (result) return result;
+    }
+    return false;
+  };
+  const diagonal = (testBoard) => {
+    const leftToRightArray = testBoard.map((row, rowIndex) => row[rowIndex]);
+    const rightToLeftArray = testBoard.map(
+      (row, rowIndex) => row[row.length - 1 - rowIndex]
+    );
+
+    return (
+      allSquaresMatch(leftToRightArray) ||
+      allSquaresMatch(rightToLeftArray) ||
+      false
+    );
+  };
 
   return (
-    allSquaresMatch(leftToRightArray) ||
-    allSquaresMatch(rightToLeftArray) ||
-    false
+    horizontal(testBoard) ||
+    vertical(testBoard) ||
+    diagonal(testBoard) ||
+    "false"
   );
 };
-
-//   return horizontal(testBoard) || vertical(testBoard) || diagonal (testBoard) || 'false'
-// };
 
 //Test boards
 const testBoard1 = [
