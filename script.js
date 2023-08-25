@@ -86,10 +86,6 @@ const gameController = (() => {
         gameBoard.updateBoard(...playPosition, info.pieceType);
         displayController.updateBoardHTML(...playPosition, info.pieceType);
 
-        displayController.updateMessage(
-          displayController.turnDisplayElem,
-          `${currentPlayer.info.playerName}'s turn : ${currentPlayer.info.pieceType}`
-        );
         displayController.updateMessage(displayController.messageElem, " ");
       } else {
         displayController.updateMessage(
@@ -109,6 +105,10 @@ const gameController = (() => {
   const changeCurrentPlayer = () => {
     currentPlayer = currentPlayer === humanPlayer ? cpuPlayer : humanPlayer;
     console.log(currentPlayer);
+    displayController.updateMessage(
+      displayController.turnDisplayElem,
+      `${currentPlayer.info.playerName}'s turn : ${currentPlayer.info.pieceType}`
+    );
   };
 
   const makePlayerPlayPiece = (position) => {
