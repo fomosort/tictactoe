@@ -23,7 +23,7 @@ const displayController = ((board) => {
   const boardElem = document.getElementById("board");
   const allSquares = document.querySelectorAll(".square");
   const messageElem = document.getElementById("message");
-  const turnElem = document.getElementById("player-turn");
+  const turnDisplayElem = document.getElementById("player-turn");
   const initBoardHTML = (board) => {
     for (i = 0; i < allSquares.length; i++) {
       allSquares[i].textContent = board.flat()[i];
@@ -47,99 +47,114 @@ const displayController = ((board) => {
   //Event Listeners
 
   // #region Event Handler Functions
-  const clickToAddPiece = function () {
-    const positionToMove = [this.getAttribute("row"), this.getAttribute("col")];
-
-    if (gameBoard.checkOccupied(...positionToMove)) {
-      currentPlayer.playPiece(positionToMove);
-      changeCurrentPlayer();
-      updateMessage(
-        turnElem,
-        `${currentPlayer.info.playerName}'s turn : ${currentPlayer.info.pieceType}`
-      );
-      updateMessage(messageElem, " ");
-    } else {
-      updateMessage(messageElem, "Square is occupied");
-      console.log("Square is occupied");
-    }
+  const clickHandlerAddPiece = function () {
+    const positionToMove = [this.getAttribute("row"), this.getAttribute("col")]
+    gameController.makePlayerPlayPiece(positionToMove);
   };
   // #endregion
 
   // #region Event Listeners
   allSquares.forEach((square) =>
-    square.addEventListener("click", clickToAddPiece)
+    square.addEventListener("click", clickHandlerAddPiece)
   );
   // #endregion
 
-  return { boardElem, initBoardHTML, updateBoardHTML, clickToAddPiece };
+  return {
+    boardElem,
+    initBoardHTML,
+    updateBoardHTML,
+    updateMessage,
+    allSquares,
+    messageElem,
+    turnDisplayElem
+  };
 })(board);
 
-const Player = (piece, playerName) => {
-  const info = {
-    playerName,
-    score: 0,
-    pieceType: piece,
+const gameController = (() => {
+    displayController.initBoardHTML(gameBoard.board);
+  const maxTurns = gameBoard.board.flat().length;
+
+
+  const Player = (piece, playerName) => {
+    const info = {
+      playerName,
+      score: 0,
+      pieceType: piece,
+    };
+
+    const playPiece = (playPosition) => {
+      if (gameBoard.checkOccupied(...playPosition)) {
+        gameBoard.updateBoard(...playPosition, info.pieceType);
+        displayController.updateBoardHTML(...playPosition, info.pieceType);
+      } else {
+        displayController.updateMessage(displayController.messageElem, "Square is occupied");
+        console.log("Square is occupied");
+      }
+    };
+    return { info, playPiece };
   };
 
-  const playPiece = (playPosition) => {
-    gameBoard.updateBoard(...playPosition, info.pieceType);
-    displayController.updateBoardHTML(...playPosition, info.pieceType);
+  //Create players
+  const humanPlayer = Player("X", "human");
+  const cpuPlayer = Player("O", "computer");
+  let currentPlayer = humanPlayer;
+  const changeCurrentPlayer = () => {
+    currentPlayer = currentPlayer === humanPlayer ? cpuPlayer : humanPlayer;
+    console.log(currentPlayer);
   };
 
-  return { info, playPiece };
-};
-
-// const gameController = (() =>{
-//Create players
-const humanPlayer = Player("X", "human");
-const cpuPlayer = Player("O", "computer");
-let currentPlayer = humanPlayer;
-const changeCurrentPlayer = () => {
-  currentPlayer = currentPlayer === humanPlayer ? cpuPlayer : humanPlayer;
-  console.log(currentPlayer);
-};
-
-// })()
-
-const checkWinner = (board) => {
-const testBoard = board
-  //Given an array, check if every item in the array is the same
-  const allSquaresMatch = (arrayToCompare) => {
-    const match = arrayToCompare.every((item) => item === arrayToCompare[0]);
-    return match ? arrayToCompare[0] : false;
-  };
-
-  const horizontal = (testBoard) => {
-    testBoard.some((row) => {
-      const arrayToCompare = row;
-      const result = allSquaresMatch(arrayToCompare);
-      if (result) return result;
-    });
-    return false;
-  };
-
-  const vertical = (testBoard) => {
-    for (i = 0; i < testBoard[0].length; i++) {
-      const arrayToCompare = testBoard.map((row) => row[i]);
-      const result = allSquaresMatch(arrayToCompare);
-      if (result) return result;
-    }
-    return false;
-  };
-  const diagonal = (testBoard) => {
-    const leftToRightArray = testBoard.map((row, rowIndex) => row[rowIndex]);
-    const rightToLeftArray = testBoard.map(
-      (row, rowIndex) => row[row.length - 1 - rowIndex]
+  const makePlayerPlayPiece = (position) => {
+    currentPlayer.playPiece(position);
+    changeCurrentPlayer();
+    displayController.updateMessage(
+        displayController.turnDisplayElem,
+      `${currentPlayer.info.playerName}'s turn : ${currentPlayer.info.pieceType}`
     );
-
-    return (
-      allSquaresMatch(leftToRightArray) ||
-      allSquaresMatch(rightToLeftArray) ||
-      false
-    );
+    displayController.updateMessage(displayController.messageElem, " ");
   };
-  return horizontal(testBoard) || vertical(testBoard) || diagonal (testBoard) || 'false'
+  return {makePlayerPlayPiece}
+})();
+
+// const checkWinner = (board) => {
+const testBoard = board;
+//Given an array, check if every item in the array is the same
+const allSquaresMatch = (arrayToCompare) => {
+  const match = arrayToCompare.every((item) => item === arrayToCompare[0]);
+  return match ? arrayToCompare[0] : false;
 };
+
+const horizontal = (testBoard) => {
+  testBoard.forEach((row) => {
+    const result = allSquaresMatch(row);
+    console.log(result);
+    if (result) return result;
+  });
+  return false;
+};
+
+const vertical = (testBoard) => {
+  for (i = 0; i < testBoard[0].length; i++) {
+    const arrayToCompare = testBoard.map((row) => row[i]);
+    const result = allSquaresMatch(arrayToCompare);
+    if (result) return result;
+  }
+  return false;
+};
+const diagonal = (testBoard) => {
+  const leftToRightArray = testBoard.map((row, rowIndex) => row[rowIndex]);
+  const rightToLeftArray = testBoard.map(
+    (row, rowIndex) => row[row.length - 1 - rowIndex]
+  );
+
+  return (
+    allSquaresMatch(leftToRightArray) ||
+    allSquaresMatch(rightToLeftArray) ||
+    false
+  );
+};
+
+//   return horizontal(testBoard) || vertical(testBoard) || diagonal (testBoard) || 'false'
+// };
 
 //Test boards
 const testBoard1 = [
@@ -165,12 +180,12 @@ const testBoard4AllFail = [
   ["X", "O", "O"],
 ];
 
+// checkWinner()
+// console.log(horizontal(testBoard2));
 
 // console.log(document.querySelector(`.square[row="1"][col="1"]`));
 
-displayController.initBoardHTML(gameBoard.board);
-gameBoard.updateBoard(0, 2, "O");
-gameBoard.updateBoard(0, 1, "X");
-displayController.updateBoardHTML(0, 2, "O");
-displayController.updateBoardHTML(0, 1, "X");
-// displayController.clickToAddPiece(currentPlayer);
+// gameBoard.updateBoard(0, 2, "O");
+// gameBoard.updateBoard(0, 1, "X");
+// displayController.updateBoardHTML(0, 2, "O");
+// displayController.updateBoardHTML(0, 1, "X");
