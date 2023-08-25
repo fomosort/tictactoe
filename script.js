@@ -73,7 +73,7 @@ const displayController = ((board) => {
 const gameController = (() => {
   displayController.initBoardHTML(gameBoard.board);
   const maxTurns = gameBoard.board.flat().length;
-
+    let currentTurn = 1
   const Player = (piece, playerName) => {
     const info = {
       playerName,
@@ -117,20 +117,26 @@ const gameController = (() => {
   const makePlayerPlayPiece = (position) => {
     const currentPiece = currentPlayer.info.pieceType;
     const wasPlaySuccessful = currentPlayer.playPiece(position);
+    if (currentTurn >= maxTurns) endGame("Draw")
     if (wasPlaySuccessful) {
       checkWinner(gameBoard.board, currentPiece) === currentPiece
         ? endGame(currentPiece)
         : changeCurrentPlayer();
+        currentTurn++
     }
 
     // currentPlayer.info.pieceType
     //if checkWinner returns false, keep playing
   };
   
-  const endGame = (currentPiece) =>{
-    console.log(`${currentPiece} wins!`)
-    displayController.updateMessage(displayController.messageElem, `${currentPiece} wins!`)
-  }
+  const endGame = (gameResult) =>{
+    // const gameResult = gameResult
+    if (gameResult === "Draw") {displayController.updateMessage(displayController.messageElem, "Draw")}
+    else displayController.updateMessage(displayController.messageElem, `${gameResult} wins!`)
+    //TODO: freeze all game functions
+    //TODO: ask if should reset game
+}
+    const resetGame = () =>{}
 
   return { makePlayerPlayPiece };
 })();
