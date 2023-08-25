@@ -8,6 +8,7 @@ const gameBoard = (() => {
 
   const updateBoard = (row, column, pieceXO) => {
     board[row][column] = pieceXO;
+    console.log(board);
   };
 
   const resetBoard = () => {
@@ -19,10 +20,8 @@ const gameBoard = (() => {
   };
 
   const checkOccupied = (row, column, piece1, piece2) => {
-    console.log(board[row][column]);
     const isOkayToMove =
       board[row][column] !== piece1 && board[row][column] !== piece2;
-    console.log(isOkayToMove);
     return isOkayToMove;
   };
 
@@ -72,6 +71,7 @@ const displayController = (() => {
     messageElem.textContent = "";
     turnDisplayElem.textContent = "";
     gameController.resetGame();
+    updateBoardHTML()
   };
   const startGame = () => {
     gameController.initGame(playerName.value, cpuName.value);
@@ -111,11 +111,7 @@ const gameController = (() => {
   let currentPlayer;
 
   const initGame = (playerName = "player", cpuName = "cpu") => {
-    gameBoard.board = [
-      [" ", " ", " "],
-      [" ", " ", " "],
-      [" ", " ", " "],
-    ];
+    
     displayController.initBoardHTML(gameBoard.board);
     maxTurns = gameBoard.board.flat().length;
     currentTurn = 1;
@@ -156,6 +152,7 @@ const gameController = (() => {
     };
     return { info, playPiece };
   };
+  //Attach all event listeners
   displayController.initEventListeners();
 
   const changeCurrentPlayer = () => {
@@ -190,14 +187,7 @@ const gameController = (() => {
 
   };
   const resetGame = () => {
-    gameBoard.board = [
-        [" ", " ", " "],
-        [" ", " ", " "], mo
-        [" ", " ", " "],
-      ]
     gameBoard.resetBoard();
-
-    console.log(gameBoard.board);
     initGame();
   };
 
@@ -205,6 +195,8 @@ const gameController = (() => {
 })();
 
 const checkWinner = (board, currentPiece) => {
+  console.log("checkWinner started");
+  console.log(gameBoard.board);
   const testBoard = board;
   //Given an array, check if every item in the array is the same
   const allSquaresMatch = (arrayToCompare) => {
@@ -240,7 +232,7 @@ const checkWinner = (board, currentPiece) => {
   const resultHorizontal = horizontal(testBoard);
   const resultVertical = vertical(testBoard);
   const resultDiagonal = diagonal(testBoard);
-
+console.log(resultHorizontal,resultVertical,resultDiagonal);
   //If any of the patterns match, return the winner's piece
   return (
     [resultHorizontal, resultVertical, resultDiagonal].some(
