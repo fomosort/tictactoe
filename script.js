@@ -81,18 +81,21 @@ const gameController = (() => {
       pieceType: piece,
     };
 
+    //Returns true if piece is played, false if not played
     const playPiece = (playPosition) => {
       if (gameBoard.checkOccupied(...playPosition)) {
         gameBoard.updateBoard(...playPosition, info.pieceType);
         displayController.updateBoardHTML(...playPosition, info.pieceType);
 
         displayController.updateMessage(displayController.messageElem, " ");
+        return true
       } else {
         displayController.updateMessage(
           displayController.messageElem,
           "Square is occupied"
         );
         console.log("Square is occupied");
+        return false
       }
     };
     return { info, playPiece };
@@ -112,24 +115,27 @@ const gameController = (() => {
   };
 
   const makePlayerPlayPiece = (position) => {
-    currentPlayer.playPiece(position);
-    changeCurrentPlayer();
+    currentPlayer.playPiece(position) && changeCurrentPlayer();
+ 
+    // currentPlayer.info.pieceType
+    //if checkWinner returns false, keep playing
+    // console.log(checkWinner(gameBoard.board))
   };
   return { makePlayerPlayPiece };
 })();
 
-const checkWinner = (board) => {
+const checkWinner = (board, currentPiece) => {
   const testBoard = board;
   //Given an array, check if every item in the array is the same
   const allSquaresMatch = (arrayToCompare) => {
-    const match = arrayToCompare.every((item) => item === arrayToCompare[0]);
+    const match = arrayToCompare.every(item => item === arrayToCompare)
+    // const match = arrayToCompare.every((item) => item === arrayToCompare[0]);
     return match ? arrayToCompare[0] : false;
   };
 
   const horizontal = (testBoard) => {
     testBoard.forEach((row) => {
       const result = allSquaresMatch(row);
-      console.log(result);
       if (result) return result;
     });
     return false;
