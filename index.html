@@ -8,10 +8,11 @@
     <script src="script.js" defer></script>
   </head>
   <body>
-    <h1 >Tic Tac Toe</h1>
+    <h1>Tic Tac Toe</h1>
     <h2 id="message"></h2>
-    <h2 id="player-turn">&nbsp;</h1>
-    <div id="board">
+    <h2 id="player-turn">&nbsp;</h2>
+    <div id="board-wrapper">
+      <div id="board">
         <div class="square" id="square1" row="0" col="0"></div>
         <div class="square" id="square2" row="0" col="1"></div>
         <div class="square" id="square3" row="0" col="2"></div>
@@ -21,6 +22,24 @@
         <div class="square" id="square7" row="2" col="0"></div>
         <div class="square" id="square8" row="2" col="1"></div>
         <div class="square" id="square9" row="2" col="2"></div>
+      </div>
+      <div id="buttons">
+        <form action="" method="get">
+            <div>
+                <label for="player-name">Player name:</label>
+                <input type="text" name="player-name" id="player-name">
+                
+            </div>
+            <div>
+                <label for="cpu-name">Cpu name:</label>
+                <input type="text" name="cpu-name" id="cpu-name">
+            </div>
+        </form>
+        <div>
+            <button id="reset">Reset</button>
+        </div>
+
+      </div>
     </div>
   </body>
 </html>

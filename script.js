@@ -1,9 +1,9 @@
 //Gameboard module
 const gameBoard = (() => {
   const board = [
-    ["_", "_", "_"],
-    ["_", "_", "_"],
-    ["_", "_", "_"],
+    [" ", " ", " "],
+    [" ", " ", " "],
+    [" ", " ", " "],
   ];
 
   const updateBoard = (row, column, pieceXO) => {
@@ -12,7 +12,7 @@ const gameBoard = (() => {
 
   //TODO:use an alternative logic to check if empty
   const checkOccupied = (row, column) => {
-    const isOkayToMove = board[row][column] === "_";
+    const isOkayToMove = board[row][column] === " ";
     return isOkayToMove;
   };
 
@@ -34,7 +34,7 @@ const displayController = ((board) => {
     const selectedSquare = boardElem.querySelector(
       `.square[row="${row}"][col="${column}"]`
     );
-    selectedSquare.textContent === "_"
+    selectedSquare.textContent === " "
       ? (selectedSquare.textContent = pieceXO)
       : console.trace("Square is occupied");
   };
@@ -71,10 +71,14 @@ const displayController = ((board) => {
 })(board);
 
 const gameController = (() => {
-  displayController.initBoardHTML(gameBoard.board);
-  const maxTurns = gameBoard.board.flat().length;
-    let currentTurn = 1
-  const Player = (piece, playerName) => {
+  
+    let maxTurns
+    let currentTurn
+    let humanPlayer
+    let cpuPlayer
+    let currentPlayer
+
+    const Player = (piece, playerName) => {
     const info = {
       playerName,
       score: 0,
@@ -101,10 +105,22 @@ const gameController = (() => {
     return { info, playPiece };
   };
 
-  //Create players
-  const humanPlayer = Player("X", "human");
-  const cpuPlayer = Player("O", "computer");
-  let currentPlayer = humanPlayer;
+  const initGame = () => {
+    gameBoard.board = [
+      [" ", " ", " "],
+      [" ", " ", " "],
+      [" ", " ", " "],
+    ];
+    displayController.initBoardHTML(gameBoard.board);
+     maxTurns = gameBoard.board.flat().length;
+     currentTurn = 1;
+
+     humanPlayer = Player("X", "human");
+     cpuPlayer = Player("O", "computer");
+     currentPlayer = humanPlayer;
+  };
+  initGame();
+
   const changeCurrentPlayer = () => {
     currentPlayer = currentPlayer === humanPlayer ? cpuPlayer : humanPlayer;
     // console.log(currentPlayer);
@@ -117,26 +133,34 @@ const gameController = (() => {
   const makePlayerPlayPiece = (position) => {
     const currentPiece = currentPlayer.info.pieceType;
     const wasPlaySuccessful = currentPlayer.playPiece(position);
-    if (currentTurn >= maxTurns) endGame("Draw")
+    if (currentTurn >= maxTurns) endGame("Draw");
     if (wasPlaySuccessful) {
       checkWinner(gameBoard.board, currentPiece) === currentPiece
         ? endGame(currentPiece)
         : changeCurrentPlayer();
-        currentTurn++
+      currentTurn++;
     }
 
     // currentPlayer.info.pieceType
     //if checkWinner returns false, keep playing
   };
-  
-  const endGame = (gameResult) =>{
+
+  const endGame = (gameResult) => {
     // const gameResult = gameResult
-    if (gameResult === "Draw") {displayController.updateMessage(displayController.messageElem, "Draw")}
-    else displayController.updateMessage(displayController.messageElem, `${gameResult} wins!`)
+    if (gameResult === "Draw") {
+      displayController.updateMessage(displayController.messageElem, "Draw");
+    } else
+      displayController.updateMessage(
+        displayController.messageElem,
+        `${gameResult} wins!`
+      );
+
     //TODO: freeze all game functions
     //TODO: ask if should reset game
-}
-    const resetGame = () =>{}
+  };
+  const resetGame = () => {
+    initGame();
+  };
 
   return { makePlayerPlayPiece };
 })();
